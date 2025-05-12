@@ -16,27 +16,31 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import AuthContext from "@/context/auth-context";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader } from "lucide-react";
+import { useContext } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-const formSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8),
+export const loginSchema = z.object({
+  username: z.string().min(3),
+  password: z.string(),
 });
 
 const Login = () => {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const { loginUser, loginLoading } = useContext(AuthContext);
+  const form = useForm<z.infer<typeof loginSchema>>({
+    resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: "",
+      username: "",
       password: "",
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log("Form submitted:", values);
-    // Add your login logic here (e.g., API call)
+  async function onSubmit(values: z.infer<typeof loginSchema>) {
+    console.log(values);
+    await loginUser(values);
   }
   return (
     <Form {...form}>
@@ -53,12 +57,12 @@ const Login = () => {
           <CardContent className="space-y-4">
             <FormField
               control={form.control}
-              name="email"
+              name="username"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>Username</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter your email" {...field} />
+                    <Input placeholder="Enter your Username" {...field} />
                   </FormControl>
                   <FormMessage className="text-start" />
                 </FormItem>
@@ -86,7 +90,7 @@ const Login = () => {
 
           <CardFooter className="flex flex-col space-y-2">
             <Button type="submit" size="lg" className="w-full">
-              Login
+              {loginLoading ? <Loader className="animate-spin" /> : "Login"}
             </Button>
             <CardDescription>
               Don't have an account?{" "}
