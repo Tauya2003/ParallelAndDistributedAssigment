@@ -6,9 +6,11 @@ class BookSerializer(serializers.ModelSerializer):
     class Meta:
         model = Book
         fields = '__all__'
+        read_only_fields = ('available_copies',)
 
 class BorrowRecordSerializer(serializers.ModelSerializer):
     book = BookSerializer(read_only=True)
+    user = serializers.StringRelatedField()
     
     class Meta:
         model = BorrowRecord
@@ -17,4 +19,4 @@ class BorrowRecordSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username']
+        fields = ('id', 'username', 'email')
